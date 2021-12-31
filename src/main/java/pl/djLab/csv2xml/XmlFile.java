@@ -103,7 +103,6 @@ public class XmlFile {
                             "\t\t\t\t</Partner>\n";
         }
 
-
         return  "\t\t\t<Partners>\n" +
                 resultString +
                 "\t\t\t</Partners>\n";

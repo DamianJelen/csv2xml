@@ -1,5 +1,6 @@
 package pl.djLab;
 
+import org.w3c.dom.ls.LSOutput;
 import pl.djLab.csv2xml.ObjProjects;
 import pl.djLab.csv2xml.XmlFile;
 
@@ -15,10 +16,29 @@ import java.util.*;
 public class Project {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner write = new Scanner(System.in);
-        System.out.print("Podaj scieżkę pliku csv źródłowego (\"C:\\test.csv\"): ");
-//        C:\Users\damian_jelen\Documents\Zgłoszenia\ARACHNE\testArachne.csv
-        String src = write.nextLine();
-//        String src = "C:\\Users\\damian_jelen\\Documents\\Zgłoszenia\\ARACHNE\\testArachne2.csv";
+        String src = "", src2 = "";
+        int count = 1;
+
+        System.out.println("Poniżej podaj ścieżkę do pliku wyeksporotwanego z raportu Arachne cz 1 Projects np. (\"C:\\arachne.csv\"),\n" +
+                "jeżeli masz wyniki w raporcie Arachne cz 2 Entieties zapisz go w tym samym miejscu i pod taką samą nazwą co pierwsza analiza\n" +
+                " z dopiskiem 2 np. (\"C:\\arachne2.csv\")");
+        System.out.println("============================================================================================================================================");
+
+        while(count == 1 || new File(src).exists()) {
+            ++count;
+//            C:\Users\damian_jelen\Documents\Zgłoszenia\ARACHNE\testArachne.csv
+//            String src = "C:\\Users\\damian_jelen\\Documents\\Zgłoszenia\\ARACHNE\\testArachne2.csv";
+            System.out.print("Podaj scieżkę pliku csv z projektami  np. (\"C:\\projects.csv\"): ");
+            src = write.nextLine();
+            src2 = src.substring(0, src.lastIndexOf(".")) + 2 + src.substring(src.lastIndexOf("."));
+
+            if(!new File(src2).exists()) {
+                src2 = "";
+            }
+        }
+
+
+        System.out.println(new File(src).exists() ? 'T' : 'N');
 
         File file = new File(src);
         Scanner readLineFile = new Scanner(file);
@@ -78,6 +98,9 @@ public class Project {
             Files.writeString(path, xmlF.ProjectsCloseLineXML, StandardOpenOption.APPEND);
 
             Files.writeString(path, xmlF.EntitiesOpenLineXML, StandardOpenOption.APPEND);
+
+
+
             Files.writeString(path, xmlF.EntitiesCloseLineXML, StandardOpenOption.APPEND);
 
             Files.writeString(path, xmlF.LastLineXML, StandardOpenOption.APPEND);
