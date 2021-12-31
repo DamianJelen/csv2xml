@@ -1,6 +1,6 @@
 package pl.djLab;
 
-import org.w3c.dom.ls.LSOutput;
+import pl.djLab.csv2xml.ObjEntities;
 import pl.djLab.csv2xml.ObjProjects;
 import pl.djLab.csv2xml.XmlFile;
 
@@ -17,39 +17,41 @@ public class Project {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Scanner write = new Scanner(System.in);
         String src = "", src2 = "";
-        int count = 1;
+        File file2 = null;
 
         System.out.println("Poniżej podaj ścieżkę do pliku wyeksporotwanego z raportu Arachne cz 1 Projects np. (\"C:\\arachne.csv\"),\n" +
                 "jeżeli masz wyniki w raporcie Arachne cz 2 Entieties zapisz go w tym samym miejscu i pod taką samą nazwą co pierwsza analiza\n" +
                 " z dopiskiem 2 np. (\"C:\\arachne2.csv\")");
         System.out.println("============================================================================================================================================");
-
-        while(count == 1 || new File(src).exists()) {
-            ++count;
-//            C:\Users\damian_jelen\Documents\Zgłoszenia\ARACHNE\testArachne.csv
-//            String src = "C:\\Users\\damian_jelen\\Documents\\Zgłoszenia\\ARACHNE\\testArachne2.csv";
+//        C:\Users\damian_jelen\Documents\Zgłoszenia\ARACHNE\testArachne.csv
+//        src = "C:\\Users\\damian_jelen\\Documents\\Zgłoszenia\\ARACHNE\\testArachne2.csv";
+//        src = "C:\\Users\\damian_jelen\\Documents\\Zgłoszenia\\ARACHNE\\Arachne cz 1 Projects.csv";
+        while(!new File(src).exists()) {
             System.out.print("Podaj scieżkę pliku csv z projektami  np. (\"C:\\projects.csv\"): ");
             src = write.nextLine();
             src2 = src.substring(0, src.lastIndexOf(".")) + 2 + src.substring(src.lastIndexOf("."));
 
-            if(!new File(src2).exists()) {
+            if(new File(src2).exists()) {
+                file2 = new File(src2);
+            } else {
                 src2 = "";
             }
         }
 
-
-        System.out.println(new File(src).exists() ? 'T' : 'N');
-
         File file = new File(src);
+        List<String> objProPartners = new ArrayList<>();
         Scanner readLineFile = new Scanner(file);
         XmlFile xmlF = new XmlFile();
-        xmlF.fileName = src.substring(src.lastIndexOf("\\") + 1, src.length() - 4) + ".xml";
         List<ObjProjects> listObjProjects = new ArrayList<>();
+        List<ObjEntities> listObjEntieties = new ArrayList<>();
+//        List<ObjEntities> listObjEntieties = src2.isEmpty() ? new ArrayList<>() : null;
         readLineFile.nextLine();
         String[] lineToArray = readLineFile.nextLine().split(",");
+
+        xmlF.fileName = src.substring(src.lastIndexOf("\\") + 1, src.length() - 4) + ".xml";
         String metaDataXml = xmlF.metaDataXML(lineToArray[2],lineToArray[3],lineToArray[4].replace("&#44;",","),lineToArray[5],lineToArray[6]);
         ObjProjects objPro = new ObjProjects(lineToArray[7],lineToArray[8],lineToArray[9].replace("&#44;",","),lineToArray[10],lineToArray[11],lineToArray[13],lineToArray[14]);
-        List<String> objProPartners = new ArrayList<>();
+
         if (lineToArray.length == 16) {
             objPro.setRoadRailWasteType(lineToArray[15]);
         }
@@ -84,6 +86,21 @@ public class Project {
         objPro.setPartnerId(objProPartners);
         listObjProjects.add(objPro);
 
+        if(!src2.isEmpty()) {
+            readLineFile = new Scanner(file2);
+            readLineFile.nextLine();
+            ObjEntities oneEntity = null;
+
+            while(readLineFile.hasNextLine()) {
+                String[] tmpStrArr = readLineFile.nextLine().split(",");
+                System.out.println(Arrays.toString(tmpStrArr));
+                oneEntity = new ObjEntities(tmpStrArr[0], tmpStrArr[1]);
+                listObjEntieties.add(oneEntity);
+            }
+
+        }
+
+
         Path path = Paths.get("src/main/java/pl/djLab/xmlFiles/" + xmlF.fileName);
         try {
             Files.writeString(path, xmlF.FirstLineXML);
@@ -99,7 +116,7 @@ public class Project {
 
             Files.writeString(path, xmlF.EntitiesOpenLineXML, StandardOpenOption.APPEND);
 
-
+            Files.writeString(path, xmlF.entitiesXml(listObjEntieties), StandardOpenOption.APPEND);
 
             Files.writeString(path, xmlF.EntitiesCloseLineXML, StandardOpenOption.APPEND);
 

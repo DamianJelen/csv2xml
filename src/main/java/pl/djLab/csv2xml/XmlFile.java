@@ -108,11 +108,14 @@ public class XmlFile {
                 "\t\t\t</Partners>\n";
     }
 
-    public String entitiesXML(List<ObjEntities> entity) {
+    public String entitiesXml(List<ObjEntities> entity) {
         String resultString = "";
 
         if(entity.isEmpty()) {
-            return "";
+            return "\t\t<Entity>\n" +
+                    "\t\t\t<Id>" + 0 + "</Id>\n" +
+                    "\t\t\t<Name>For this projects we don't have entities</Name>\n" +
+                    "\t\t</Entity>\n";
         }
 
         for(ObjEntities entityObj : entity) {
@@ -122,8 +125,6 @@ public class XmlFile {
                             "\t\t</Entity>\n";
         }
 
-        return "\t<Entities>\n" +
-                resultString +
-                "\t</Entities>\n";
+        return resultString;
     }
 }
